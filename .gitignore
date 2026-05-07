@@ -1,4 +1,10 @@
 node_modules/
 .env
+<<<<<<< HEAD
 artifacts/
 cache/
+=======
+.cache/
+artifacts/
+coverage/
+>>>>>>> 186adb95d9b964804dbe6832c172c56397b52bda

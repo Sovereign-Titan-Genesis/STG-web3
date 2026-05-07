@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>STG Explorer Mini</title>
+  <script src="https://cdn.jsdelivr.net/npm/ethers/dist/ethers.min.js"></script>
+  <style>
+    body {
+      font-family: monospace;
+      background: #0d0d0d;
+      color: #00ffcc;
+      padding: 20px;
+    }
+    h1 { color: #ffcc00; }
+    .tx { margin: 10px 0; padding: 10px; border: 1px solid #333; }
+  </style>
+</head>
+<body>
+  <h1>🛡️ STG Explorer Mini</h1>
+  <div id="output">Loading...</div>
+
+  <script>
+    async function main() {
+      // Provider ke localhost Hardhat node
+      const provider = new ethers.JsonRpcProvider("http://127.0.0.1:8545");
+
+      // Alamat kontrak hasil deploy di localhost
+      const contractAddress = "ALAMAT_KONTRAK_LOCAL";
+
+      // ABI minimal STGToken
+      const abi = [
+        "function balanceOf(address) view returns (uint)",
+        "function transfer(address,uint) returns (bool)",
+        "event Transfer(address indexed from, address indexed to, uint amount)"
+      ];
+
+      const token = new ethers.Contract(contractAddress, abi, provider);
+
+      // Ambil akun dummy
+      const accounts = await provider.listAccounts();
+      const owner = accounts[0];
+      const user1 = accounts[1];
+      const user2 = accounts[2];
+
+      // Tampilkan saldo awal
+      let html = "<h2>Saldo Awal</h2>";
+      html += `<p>Owner: ${await token.balanceOf(owner)}</p>`;
+      html += `<p>User1: ${await token.balanceOf(user1)}</p>`;
+      html += `<p>User2: ${await token.balanceOf(user2)}</p>`;
+
+      // Listen event Transfer
+      token.on("Transfer", (from, to, amount, event) => {
+        const txHtml = `
+          <div class="tx">
+            <strong>TX Hash:</strong> ${event.log.transactionHash}<br>
+            <strong>From:</strong> ${from}<br>
+            <strong>To:</strong> ${to}<br>
+            <strong>Amount:</strong> ${amount.toString()}
+          </div>
+        `;
+        document.getElementById("output").innerHTML += txHtml;
+      });
+
+      document.getElementById("output").innerHTML = html;
+    }
+
+    main();
+  </script>
+</body>
+</html>

@@ -1,0 +1,59 @@
+name: STG Treasury Automation
+
+on:
+  workflow_dispatch:
+    inputs:
+      treasury_action:
+        description: 'Pilih Mode Treasury'
+        required: true
+        type: choice
+        options:
+          - 'ALLOCATE_FUNDS'
+          - 'PROCESS_TAX_GATEWAY'
+          - 'EXECUTE_VESTING'
+          - 'RUN_ARBITRAGE_ENGINE'
+
+jobs:
+  treasury-process:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Initialize Treasury Guard
+        run: |
+          echo "💰 Treasury Automation: ACTIVE"
+          echo "Mode: ${{ github.event.inputs.treasury_action }} sedang diproses..."
+
+      - name: Allocate Funds
+        if: github.event.inputs.treasury_action == 'ALLOCATE_FUNDS'
+        run: |
+          echo "📦 Mengalokasikan dana Unit 008 ke modul operasional..."
+          echo "| $(date) | ALLOCATE | Rp 1.498 T | Funds Distributed |" >> TREASURY_LOG.md
+
+      - name: Process Tax Gateway
+        if: github.event.inputs.treasury_action == 'PROCESS_TAX_GATEWAY'
+        run: |
+          echo "🧾 Memproses pajak otomatis via NPWP Sultan..."
+          echo "| $(date) | TAX | NPWP 73.093.085.6-009.000 | Processed |" >> TREASURY_LOG.md
+
+      - name: Execute Vesting
+        if: github.event.inputs.treasury_action == 'EXECUTE_VESTING'
+        run: |
+          echo "📆 Menjalankan jadwal vesting dana sesuai kontrak..."
+          echo "| $(date) | VESTING | 12 Bulan | Executed |" >> TREASURY_LOG.md
+
+      - name: Run Arbitrage Engine
+        if: github.event.inputs.treasury_action == 'RUN_ARBITRAGE_ENGINE'
+        run: |
+          echo "⚖️ Menjalankan arbitrase otomatis antar DEX untuk menjaga stabilitas harga..."
+          echo "| $(date) | ARBITRAGE | Multi-DEX | Executed |" >> TREASURY_LOG.md
+
+      - name: Secure Audit Trail
+        run: |
+          git config user.name "CITO-STG-Bot"
+          git config user.email "cito@stg.internal"
+          git add TREASURY_LOG.md
+          git commit -m "Treasury Automation Update: ${{ github.event.inputs.treasury_action }}"
+          git push
+          

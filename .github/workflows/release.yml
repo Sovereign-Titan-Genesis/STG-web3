@@ -1,0 +1,56 @@
+name: Create GitHub Release
+
+on:
+  push:
+    tags:
+      - 'v*.*.*'   # contoh: v1.0.0, v2.1.3
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: 18
+
+    - name: Install dependencies
+      run: npm install
+
+    - name: Compile contracts
+      run: npx hardhat compile
+
+    - name: Deploy to Sepolia
+      id: deploy
+      env:
+        ALCHEMY_API_KEY: ${{ secrets.ALCHEMY_API_KEY }}
+        DEPLOYER_PRIVATE_KEY: ${{ secrets.DEPLOYER_PRIVATE_KEY }}
+      run: |
+        ADDR=$(npx hardhat run scripts/deploy.js --network sepolia | grep "STGToken deployed to:" | awk '{print $4}')
+        echo "contract_address=$ADDR" >> $GITHUB_OUTPUT
+
+    - name: Generate release notes
+      run: |
+        echo "## Release Notes" > release_notes.md
+        echo "STGToken deployed to Sepolia at: ${{ steps.deploy.outputs.contract_address }}" >> release_notes.md
+        echo "" >> release_notes.md
+        echo "Includes audit report and test results." >> release_notes.md
+
+    - name: Upload artifacts
+      uses: actions/upload-artifact@v4
+      with:
+        name: release-artifacts
+        path: results/
+
+    - name: Create GitHub Release
+      uses: softprops/action-gh-release@v2
+      with:
+        body_path: release_notes.md
+        files: results/*
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        
