@@ -1,0 +1,305 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="utf-8">
+  <title>STG Galactica OS — Multi Wallet</title>
+  <script src="https://cdn.jsdelivr.net/npm/ethers/dist/ethers.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/three@0.152.2/build/three.min.js"></script>
+  <style>
+    body, html { margin:0; padding:0; overflow:hidden; font-family:"Courier New", monospace; color:#00ffcc; }
+    #overlay { position:absolute; top:20px; left:20px; z-index:10; background:rgba(0,0,0,0.7); padding:18px; border-radius:10px; box-shadow:0 0 20px #00ffcc; width:420px; max-height:90vh; overflow:auto; }
+    h1 { color:#ffcc00; text-shadow:0 0 10px #ffcc00; margin:0 0 8px 0; }
+    .section { margin:10px 0; }
+    .terminal { background:#0b0b0b; color:#0f0; padding:10px; border-radius:6px; box-shadow:inset 0 0 8px #0f0; font-size:13px; }
+    input, select, button, textarea { width:100%; box-sizing:border-box; margin-top:6px; padding:8px; background:#000; color:#0f0; border:1px solid #222; border-radius:6px; font-family:"Courier New"; }
+    .small { width:48%; display:inline-block; }
+    .tx { margin:8px 0; padding:8px; border-left:3px solid #ffcc00; background:rgba(0,0,0,0.6); }
+    .wallet-row { display:flex; gap:8px; align-items:center; margin-top:6px; }
+    .muted { color:#888; font-size:12px; }
+    .danger { color:#ff6666; font-weight:bold; }
+  </style>
+</head>
+<body>
+  <div id="overlay">
+    <h1>🌌 STG Galactica OS — Command & Multi Wallet</h1>
+
+    <div class="section">
+      <div class="terminal" id="output">Command OS ready. Ketik perintah atau gunakan UI di bawah.</div>
+    </div>
+
+    <div class="section">
+      <label class="muted">Command Input</label>
+      <input id="command" placeholder="Contoh: stg balance | stg send 0xabc... 10">
+    </div>
+
+    <div class="section">
+      <label class="muted">Active Wallet</label>
+      <select id="walletSelect"></select>
+      <div class="wallet-row">
+        <button id="btnAddPK">Tambah Private Key</button>
+        <button id="btnConnectMM">Connect MetaMask</button>
+      </div>
+      <textarea id="pkInput" placeholder="Tempel private key di sini lalu klik Add (Hanya untuk latihan lokal)" style="display:none;"></textarea>
+      <div id="walletList" class="muted"></div>
+    </div>
+
+    <div class="section">
+      <label class="muted">Watched Addresses (cek saldo banyak address)</label>
+      <textarea id="watchList" placeholder="Masukkan alamat per baris, lalu klik Update Watch" rows="4"></textarea>
+      <button id="btnUpdateWatch">Update Watch</button>
+      <div id="watchBalances" class="terminal" style="margin-top:8px;">No watched addresses</div>
+    </div>
+
+    <div class="section">
+      <label class="muted">Explorer Events</label>
+      <div id="explorer">Menunggu event Transfer...</div>
+    </div>
+
+    <div class="section muted">
+      <div><strong>Security:</strong> Jangan upload private key ke repo. Private key yang dimasukkan hanya disimpan di memori browser saat sesi aktif.</div>
+    </div>
+  </div>
+
+  <script>
+    // === Three.js Background (sederhana) ===
+    const scene = new THREE.Scene();
+    const camera = new THREE.PerspectiveCamera(75, window.innerWidth/window.innerHeight, 0.1, 1000);
+    const renderer = new THREE.WebGLRenderer({ antialias:true });
+    renderer.setSize(window.innerWidth, window.innerHeight);
+    document.body.appendChild(renderer.domElement);
+
+    // Stars
+    const starGeometry = new THREE.BufferGeometry();
+    const starCount = 1200;
+    const starVertices = new Float32Array(starCount * 3);
+    for (let i = 0; i < starCount * 3; i++) starVertices[i] = (Math.random() - 0.5) * 2000;
+    starGeometry.setAttribute('position', new THREE.BufferAttribute(starVertices, 3));
+    const starMaterial = new THREE.PointsMaterial({ color: 0x00ffcc, size: 1.2 });
+    const stars = new THREE.Points(starGeometry, starMaterial);
+    scene.add(stars);
+
+    // Grid
+    const gridHelper = new THREE.GridHelper(1200, 60, 0xffcc00, 0x222222);
+    gridHelper.position.y = -200;
+    scene.add(gridHelper);
+
+    camera.position.z = 5;
+    function animate() {
+      requestAnimationFrame(animate);
+      stars.rotation.x += 0.0006;
+      stars.rotation.y += 0.0008;
+      renderer.render(scene, camera);
+    }
+    animate();
+
+    // === Blockchain / Wallet Logic ===
+    const rpcUrl = "http://127.0.0.1:8545"; // default local node
+    const rpcProvider = new ethers.JsonRpcProvider(rpcUrl);
+    let activeProvider = rpcProvider; // bisa diganti ke MetaMask provider jika connect
+    const contractAddress = "ALAMAT_KONTRAK_LOCAL"; // ganti dengan alamat deploy
+    const abi = [
+      "function balanceOf(address) view returns (uint)",
+      "function transfer(address,uint) returns (bool)",
+      "event Transfer(address indexed from, address indexed to, uint amount)"
+    ];
+    const token = new ethers.Contract(contractAddress, abi, rpcProvider);
+
+    // In-memory wallet store
+    const wallets = []; // {id, label, address, signer}
+    const watched = new Set();
+
+    // UI refs
+    const output = document.getElementById("output");
+    const input = document.getElementById("command");
+    const walletSelect = document.getElementById("walletSelect");
+    const btnAddPK = document.getElementById("btnAddPK");
+    const btnConnectMM = document.getElementById("btnConnectMM");
+    const pkInput = document.getElementById("pkInput");
+    const walletList = document.getElementById("walletList");
+    const watchList = document.getElementById("watchList");
+    const btnUpdateWatch = document.getElementById("btnUpdateWatch");
+    const watchBalances = document.getElementById("watchBalances");
+    const explorer = document.getElementById("explorer");
+
+    // Helper: append output
+    function appendOutput(html) {
+      output.innerHTML += "<div>" + html + "</div>";
+      output.scrollTop = output.scrollHeight;
+    }
+
+    // Load local node accounts into wallets on start
+    async function loadLocalAccounts() {
+      try {
+        const accounts = await rpcProvider.listAccounts();
+        for (let i = 0; i < accounts.length; i++) {
+          const addr = accounts[i];
+          const signer = rpcProvider.getSigner(i);
+          addWallet({ label: `Local ${i}`, address: addr, signer, source: "local" });
+        }
+      } catch (e) {
+        appendOutput("Gagal load local accounts: " + e.message);
+      }
+    }
+
+    // Add wallet to in-memory list and UI
+    function addWallet({ label, address, signer, source="custom" }) {
+      const id = "w" + (wallets.length + 1);
+      wallets.push({ id, label, address, signer, source });
+      const opt = document.createElement("option");
+      opt.value = id;
+      opt.text = `${label} — ${short(address)}`;
+      walletSelect.appendChild(opt);
+      updateWalletListUI();
+      if (wallets.length === 1) walletSelect.value = id;
+    }
+
+    function updateWalletListUI() {
+      walletList.innerHTML = wallets.map(w => `${w.label}: ${w.address}`).join("<br>");
+    }
+
+    function short(addr) {
+      return addr.slice(0,6) + "..." + addr.slice(-4);
+    }
+
+    // Add private key flow
+    btnAddPK.addEventListener("click", () => {
+      if (pkInput.style.display === "none") {
+        pkInput.style.display = "block";
+        pkInput.focus();
+        btnAddPK.textContent = "Add PK (klik lagi untuk hide)";
+      } else {
+        const pk = pkInput.value.trim();
+        if (pk) {
+          try {
+            const wallet = new ethers.Wallet(pk, rpcProvider);
+            addWallet({ label: "PK Wallet", address: wallet.address, signer: wallet, source: "pk" });
+            appendOutput("Private key wallet ditambahkan: " + short(wallet.address));
+            pkInput.value = "";
+            pkInput.style.display = "none";
+            btnAddPK.textContent = "Tambah Private Key";
+          } catch (e) {
+            appendOutput("Private key invalid: " + e.message);
+          }
+        } else {
+          pkInput.style.display = "none";
+          btnAddPK.textContent = "Tambah Private Key";
+        }
+      }
+    });
+
+    // Connect MetaMask
+    btnConnectMM.addEventListener("click", async () => {
+      if (!window.ethereum) {
+        appendOutput("MetaMask tidak ditemukan di browser.");
+        return;
+      }
+      try {
+        await window.ethereum.request({ method: 'eth_requestAccounts' });
+        const mmProvider = new ethers.BrowserProvider(window.ethereum);
+        activeProvider = mmProvider;
+        const signer = await mmProvider.getSigner();
+        const addr = await signer.getAddress();
+        addWallet({ label: "MetaMask", address: addr, signer, source: "metamask" });
+        appendOutput("MetaMask connected: " + short(addr));
+      } catch (e) {
+        appendOutput("Gagal connect MetaMask: " + e.message);
+      }
+    });
+
+    // Update watched addresses
+    btnUpdateWatch.addEventListener("click", async () => {
+      watched.clear();
+      const lines = watchList.value.split(/\r?\n/).map(s => s.trim()).filter(Boolean);
+      for (const a of lines) watched.add(a);
+      await refreshWatchedBalances();
+    });
+
+    async function refreshWatchedBalances() {
+      if (watched.size === 0) {
+        watchBalances.innerHTML = "No watched addresses";
+        return;
+      }
+      let html = "";
+      for (const addr of watched) {
+        try {
+          const bal = await token.balanceOf(addr);
+          html += `${short(addr)}: ${bal}<br>`;
+        } catch (e) {
+          html += `${short(addr)}: error (${e.message})<br>`;
+        }
+      }
+      watchBalances.innerHTML = html;
+    }
+
+    // Command input handling
+    input.addEventListener("keydown", async (e) => {
+      if (e.key !== "Enter") return;
+      const cmd = input.value.trim();
+      input.value = "";
+      appendOutput("> " + cmd);
+      if (cmd === "stg balance") {
+        const sel = wallets.find(w => w.id === walletSelect.value);
+        if (!sel) { appendOutput("Pilih wallet aktif dulu."); return; }
+        try {
+          const bal = await token.balanceOf(sel.address);
+          appendOutput(`STG Balance (${sel.label}): ${bal}`);
+        } catch (err) {
+          appendOutput("Error balance: " + err.message);
+        }
+      } else if (cmd.startsWith("stg send")) {
+        const parts = cmd.split(/\s+/);
+        if (parts.length < 4) { appendOutput("Format: stg send <to> <amount>"); return; }
+        const to = parts[2];
+        const amount = parts[3];
+        const sel = wallets.find(w => w.id === walletSelect.value);
+        if (!sel) { appendOutput("Pilih wallet aktif dulu."); return; }
+        try {
+          // Ensure signer is connected to provider
+          let signer = sel.signer;
+          // If signer is a BrowserProvider signer, use it directly; if it's a Wallet with provider, it's fine.
+          const contractWithSigner = token.connect(signer);
+          const tx = await contractWithSigner.transfer(to, amount);
+          appendOutput(`TX submitted: ${tx.hash}`);
+          await tx.wait();
+          appendOutput(`TX confirmed: ${tx.hash}`);
+          await refreshWatchedBalances();
+        } catch (err) {
+          appendOutput("Error send: " + err.message);
+        }
+      } else if (cmd === "list wallets") {
+        appendOutput("Wallets:");
+        wallets.forEach(w => appendOutput(`${w.id} — ${w.label} — ${w.address}`));
+      } else {
+        appendOutput("Unknown command: " + cmd);
+      }
+    });
+
+    // Listen Transfer events (use rpcProvider to ensure events from local node)
+    token.on("Transfer", async (from, to, amount, event) => {
+      const txHash = event.log.transactionHash || event.transactionHash || "unknown";
+      const html = `<div class="tx"><strong>Transfer</strong><br>TX: ${txHash}<br>From: ${from}<br>To: ${to}<br>Amount: ${amount.toString()}</div>`;
+      explorer.innerHTML = html + explorer.innerHTML;
+      await refreshWatchedBalances();
+    });
+
+    // Initialize
+    (async () => {
+      await loadLocalAccounts();
+      // default watch: first three local accounts
+      try {
+        const accounts = await rpcProvider.listAccounts();
+        watchList.value = accounts.slice(0,3).join("\n");
+        await btnUpdateWatch.click();
+      } catch(e) {}
+      appendOutput("Multi‑wallet module siap. Gunakan 'stg balance' atau 'stg send <to> <amount>'");
+    })();
+
+    // Resize handler
+    window.addEventListener('resize', () => {
+      renderer.setSize(window.innerWidth, window.innerHeight);
+      camera.aspect = window.innerWidth / window.innerHeight;
+      camera.updateProjectionMatrix();
+    });
+  </script>
+</body>
+</html>
