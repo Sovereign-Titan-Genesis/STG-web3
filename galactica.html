@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>STG Galactica OS</title>
+  <script src="https://cdn.jsdelivr.net/npm/ethers/dist/ethers.min.js"></script>
+  <style>
+    body {
+      background: radial-gradient(circle at top left, #0d0d0d, #000);
+      color: #00ffcc;
+      font-family: "Courier New", monospace;
+      margin: 0;
+      padding: 20px;
+    }
+    h1 {
+      color: #ffcc00;
+      text-shadow: 0 0 10px #ffcc00;
+    }
+    .panel {
+      background: rgba(20,20,20,0.9);
+      border: 1px solid #333;
+      padding: 15px;
+      margin: 10px 0;
+      border-radius: 8px;
+      box-shadow: 0 0 15px #00ffcc;
+    }
+    .tx {
+      margin: 8px 0;
+      padding: 8px;
+      border-left: 3px solid #ffcc00;
+      background: rgba(0,0,0,0.6);
+    }
+    .terminal {
+      background: #111;
+      color: #0f0;
+      padding: 10px;
+      font-size: 14px;
+      border-radius: 5px;
+      box-shadow: inset 0 0 10px #0f0;
+    }
+  </style>
+</head>
+<body>
+  <h1>🌌 STG Galactica OS</h1>
+  <div class="panel">
+    <h2>Saldo Akun</h2>
+    <div id="balances" class="terminal">Loading balances...</div>
+  </div>
+
+  <div class="panel">
+    <h2>Explorer Mini</h2>
+    <div id="explorer">Menunggu transaksi...</div>
+  </div>
+
+  <script>
+    async function main() {
+      const provider = new ethers.JsonRpcProvider("http://127.0.0.1:8545");
+      const contractAddress = "ALAMAT_KONTRAK_LOCAL"; // ganti dengan alamat kontrak deploy
+      const abi = [
+        "function balanceOf(address) view returns (uint)",
+        "event Transfer(address indexed from, address indexed to, uint amount)"
+      ];
+      const token = new ethers.Contract(contractAddress, abi, provider);
+
+      const accounts = await provider.listAccounts();
+      const owner = accounts[0];
+      const user1 = accounts[1];
+      const user2 = accounts[2];
+
+      // Update saldo
+      async function updateBalances() {
+        const balOwner = await token.balanceOf(owner);
+        const balUser1 = await token.balanceOf(user1);
+        const balUser2 = await token.balanceOf(user2);
+        document.getElementById("balances").innerHTML =
+          `Owner: ${balOwner}<br>User1: ${balUser1}<br>User2: ${balUser2}`;
+      }
+      await updateBalances();
+
+      // Listen event Transfer
+      token.on("Transfer", async (from, to, amount, event) => {
+        const txHtml = `
+          <div class="tx">
+            <strong>TX Hash:</strong> ${event.log.transactionHash}<br>
+            <strong>From:</strong> ${from}<br>
+            <strong>To:</strong> ${to}<br>
+            <strong>Amount:</strong> ${amount.toString()}
+          </div>
+        `;
+        document.getElementById("explorer").innerHTML += txHtml;
+        await updateBalances();
+      });
+    }
+    main();
+  </script>
+</body>
+</html>
