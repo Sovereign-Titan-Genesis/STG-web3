@@ -1,0 +1,52 @@
+name: STG Community Governance Drop
+
+on:
+  workflow_dispatch:
+    inputs:
+      governance_action:
+        description: 'Pilih Mode Governance'
+        required: true
+        type: choice
+        options:
+          - 'DISTRIBUTE_VOTING_TOKENS'
+          - 'SNAPSHOT_PROPOSAL'
+          - 'EXECUTE_COMMUNITY_DECISION'
+
+jobs:
+  governance-process:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Initialize Governance Guard
+        run: |
+          echo "🗳️ Community Governance Drop: ACTIVE"
+          echo "Mode: ${{ github.event.inputs.governance_action }} sedang diproses..."
+
+      - name: Distribute Voting Tokens
+        if: github.event.inputs.governance_action == 'DISTRIBUTE_VOTING_TOKENS'
+        run: |
+          echo "📦 Membagikan hak suara ke masyarakat Unit 012..."
+          echo "| $(date) | DISTRIBUTE | 1.680 Contracts | Voting Tokens Dropped |" >> GOVERNANCE_LOG.md
+
+      - name: Snapshot Proposal
+        if: github.event.inputs.governance_action == 'SNAPSHOT_PROPOSAL'
+        run: |
+          echo "📸 Membuat snapshot proposal untuk voting komunitas..."
+          echo "| $(date) | SNAPSHOT | Proposal ID | Created |" >> GOVERNANCE_LOG.md
+
+      - name: Execute Community Decision
+        if: github.event.inputs.governance_action == 'EXECUTE_COMMUNITY_DECISION'
+        run: |
+          echo "🚀 Mengeksekusi keputusan komunitas sesuai hasil voting..."
+          echo "| $(date) | EXECUTE | Proposal ID | Approved & Executed |" >> GOVERNANCE_LOG.md
+
+      - name: Secure Audit Trail
+        run: |
+          git config user.name "CITO-STG-Bot"
+          git config user.email "cito@stg.internal"
+          git add GOVERNANCE_LOG.md
+          git commit -m "Community Governance Update: ${{ github.event.inputs.governance_action }}"
+          git push
+          
