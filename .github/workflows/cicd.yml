@@ -1,0 +1,77 @@
+name: STG Sovereign CI/CD Matrix
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+  workflow_dispatch:
+
+jobs:
+  matrix-pipeline:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        stage: [test, lint, audit, report, deploy]
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 18
+
+      - name: Install Dependencies
+        run: npm install
+
+      - name: Compile Contracts
+        run: npx hardhat compile
+
+      - name: Run Tests
+        if: matrix.stage == 'test'
+        run: npx hardhat test
+
+      - name: Run Lint
+        if: matrix.stage == 'lint'
+        run: |
+          npx eslint . --ext .js,.ts
+          npx prettier --check .
+          npx solhint 'contracts/**/*.sol'
+
+      - name: Run Audit (Slither)
+        if: matrix.stage == 'audit'
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.10'
+      - name: Install Slither
+        if: matrix.stage == 'audit'
+        run: pip install slither-analyzer
+      - name: Slither Analysis
+        if: matrix.stage == 'audit'
+        run: slither ./contracts --solc-remaps "@openzeppelin=node_modules/@openzeppelin"
+
+      - name: Generate Report
+        if: matrix.stage == 'report'
+        run: |
+          mkdir -p results
+          echo "<html><body><h1>STG Audit Report</h1>" > results/report.html
+          echo "<h2>Test Results</h2><pre>" >> results/report.html
+          npx hardhat test >> results/report.html
+          echo "</pre></body></html>" >> results/report.html
+          sudo apt-get update && sudo apt-get install -y wkhtmltopdf
+          wkhtmltopdf results/report.html results/report.pdf
+      - name: Upload Report Artifact
+        if: matrix.stage == 'report'
+        uses: actions/upload-artifact@v4
+        with:
+          name: audit-report
+          path: results/
+
+      - name: Deploy to Sepolia
+        if: matrix.stage == 'deploy'
+        env:
+          ALCHEMY_API_KEY: ${{ secrets.ALCHEMY_API_KEY }}
+          DEPLOYER_PRIVATE_KEY: ${{ secrets.DEPLOYER_PRIVATE_KEY }}
+        run: npx hardhat run scripts/deploy.js --network sepolia
+        
