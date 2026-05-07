@@ -1,0 +1,32 @@
+name: Deploy to Sepolia
+
+on:
+  push:
+    tags:
+      - 'v*.*.*'   # contoh: v1.0.0, v2.1.3
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: 18
+
+    - name: Install dependencies
+      run: npm install
+
+    - name: Compile contracts
+      run: npx hardhat compile
+
+    - name: Deploy to Sepolia
+      env:
+        ALCHEMY_API_KEY: ${{ secrets.ALCHEMY_API_KEY }}
+        DEPLOYER_PRIVATE_KEY: ${{ secrets.DEPLOYER_PRIVATE_KEY }}
+      run: npx hardhat run scripts/deploy.js --network sepolia
+      
