@@ -1,0 +1,60 @@
+name: Generate Audit & Test Report
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+
+jobs:
+  report:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: 18
+
+    - name: Install dependencies
+      run: npm install
+
+    - name: Run Hardhat tests with report
+      run: npx hardhat test --reporter mocha-junit-reporter --reporter-options mochaFile=results/test-results.xml
+
+    - name: Setup Python
+      uses: actions/setup-python@v5
+      with:
+        python-version: '3.10'
+
+    - name: Install Slither
+      run: pip install slither-analyzer
+
+    - name: Compile contracts
+      run: npx hardhat compile
+
+    - name: Run Slither analysis to JSON
+      run: slither ./contracts --json results/slither-report.json --solc-remaps "@openzeppelin=node_modules/@openzeppelin"
+
+    - name: Generate HTML/PDF report
+      run: |
+        mkdir -p results
+        echo "<html><body><h1>STG-Chain Audit Report</h1>" > results/report.html
+        echo "<h2>Test Results</h2><pre>" >> results/report.html
+        cat results/test-results.xml >> results/report.html
+        echo "</pre><h2>Slither Report</h2><pre>" >> results/report.html
+        cat results/slither-report.json >> results/report.html
+        echo "</pre></body></html>" >> results/report.html
+        # Convert to PDF (requires wkhtmltopdf)
+        sudo apt-get update && sudo apt-get install -y wkhtmltopdf
+        wkhtmltopdf results/report.html results/report.pdf
+
+    - name: Upload report artifact
+      uses: actions/upload-artifact@v4
+      with:
+        name: audit-report
+        path: results/
+        
