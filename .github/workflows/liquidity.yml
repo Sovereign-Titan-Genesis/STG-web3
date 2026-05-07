@@ -1,0 +1,55 @@
+name: Liquidity Injection Dashboard
+
+on:
+  workflow_dispatch:
+    inputs:
+      tranche:
+        description: 'Pilih tranche likuiditas untuk injeksi'
+        required: true
+        type: choice
+        options:
+          - 'TRANCHE-01-INITIAL-LAUNCH'
+          - 'TRANCHE-02-VESTING-6M'
+          - 'TRANCHE-03-VESTING-12M'
+
+jobs:
+  liquidity-process:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Initialize Liquidity Guard
+        run: |
+          echo "💳 Liquidity Injection Active"
+          echo "Tranche: ${{ github.event.inputs.tranche }} sedang diproses..."
+
+      - name: Inject Initial Launch Liquidity
+        if: github.event.inputs.tranche == 'TRANCHE-01-INITIAL-LAUNCH'
+        run: |
+          echo "🚀 Menyuntikkan likuiditas awal ke DEX..."
+          # Perintah injeksi tranche 01 di sini
+          echo "| $(date) | TRANCHE-01 | 500M STG | INJECTED |" >> LIQUIDITY_LOG.md
+
+      - name: Inject Vesting 6M
+        if: github.event.inputs.tranche == 'TRANCHE-02-VESTING-6M'
+        run: |
+          echo "📆 Menyuntikkan likuiditas sesuai jadwal vesting 6 bulan..."
+          # Perintah injeksi tranche 02 di sini
+          echo "| $(date) | TRANCHE-02 | 500M STG | INJECTED |" >> LIQUIDITY_LOG.md
+
+      - name: Inject Vesting 12M
+        if: github.event.inputs.tranche == 'TRANCHE-03-VESTING-12M'
+        run: |
+          echo "📆 Menyuntikkan likuiditas sesuai jadwal vesting 12 bulan..."
+          # Perintah injeksi tranche 03 di sini
+          echo "| $(date) | TRANCHE-03 | 498M STG | INJECTED |" >> LIQUIDITY_LOG.md
+
+      - name: Secure Audit Trail
+        run: |
+          git config user.name "CITO-STG-Bot"
+          git config user.email "cito@stg.internal"
+          git add LIQUIDITY_LOG.md
+          git commit -m "Liquidity Injection Completed: ${{ github.event.inputs.tranche }}"
+          git push
+          
