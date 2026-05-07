@@ -1,0 +1,39 @@
+name: Security Audit (Slither)
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+
+jobs:
+  audit:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+
+    - name: Setup Python
+      uses: actions/setup-python@v5
+      with:
+        python-version: '3.10'
+
+    - name: Install Slither
+      run: |
+        pip install slither-analyzer
+
+    - name: Install Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: 18
+
+    - name: Install dependencies
+      run: npm install
+
+    - name: Compile contracts
+      run: npx hardhat compile
+
+    - name: Run Slither analysis
+      run: slither ./contracts --solc-remaps "@openzeppelin=node_modules/@openzeppelin"
+      
