@@ -1,5 +1,3 @@
-# STG-web3-
-sebagai Web3 Transition Layer
 # STG-Web3
 
 Sovereign Titan Genesis — Web3 Transition Layer
