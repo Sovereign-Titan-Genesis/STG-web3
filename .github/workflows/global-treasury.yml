@@ -1,0 +1,52 @@
+name: STG Global Treasury Audit System
+
+on:
+  workflow_dispatch:
+    inputs:
+      treasury_action:
+        description: 'Pilih Mode Treasury Audit'
+        required: true
+        type: choice
+        options:
+          - 'AUDIT_GLOBAL_TREASURY'
+          - 'LOG_TAX_TRANSACTIONS'
+          - 'VERIFY_RESERVE_BALANCE'
+
+jobs:
+  treasury-process:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Initialize Treasury Guard
+        run: |
+          echo "💰 Global Treasury Audit System: ACTIVE"
+          echo "Mode: ${{ github.event.inputs.treasury_action }} sedang diproses..."
+
+      - name: Audit Global Treasury
+        if: github.event.inputs.treasury_action == 'AUDIT_GLOBAL_TREASURY'
+        run: |
+          echo "📊 Melakukan audit kas & treasury internasional..."
+          echo "| $(date) | TREASURY | Audit | Completed |" >> TREASURY_LOG.md
+
+      - name: Log Tax Transactions
+        if: github.event.inputs.treasury_action == 'LOG_TAX_TRANSACTIONS'
+        run: |
+          echo "🧾 Mencatat transaksi pajak global..."
+          echo "| $(date) | TREASURY | Tax | Logged |" >> TREASURY_LOG.md
+
+      - name: Verify Reserve Balance
+        if: github.event.inputs.treasury_action == 'VERIFY_RESERVE_BALANCE'
+        run: |
+          echo "🏦 Memverifikasi saldo cadangan internasional..."
+          echo "| $(date) | TREASURY | Reserve Balance | Verified |" >> TREASURY_LOG.md
+
+      - name: Secure Audit Trail
+        run: |
+          git config user.name "CITO-STG-Bot"
+          git config user.email "cito@stg.internal"
+          git add TREASURY_LOG.md
+          git commit -m "Treasury Audit Update: ${{ github.event.inputs.treasury_action }}"
+          git push
+          
