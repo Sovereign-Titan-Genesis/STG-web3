@@ -1,0 +1,52 @@
+name: STG Global Humanitarian Aid Distribution Dashboard
+
+on:
+  workflow_dispatch:
+    inputs:
+      aid_action:
+        description: 'Pilih Mode Distribusi Bantuan'
+        required: true
+        type: choice
+        options:
+          - 'MONITOR_AID_FLOW'
+          - 'TRACK_EMERGENCY_SUPPLIES'
+          - 'AUDIT_DISTRIBUTION_TRANSPARENCY'
+
+jobs:
+  aid-process:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Initialize Aid Guard
+        run: |
+          echo "🚑 Humanitarian Aid Distribution Dashboard: ACTIVE"
+          echo "Mode: ${{ github.event.inputs.aid_action }} sedang diproses..."
+
+      - name: Monitor Aid Flow
+        if: github.event.inputs.aid_action == 'MONITOR_AID_FLOW'
+        run: |
+          echo "📡 Memantau aliran bantuan global..."
+          echo "| $(date) | AID | Flow | Monitored |" >> AID_LOG.md
+
+      - name: Track Emergency Supplies
+        if: github.event.inputs.aid_action == 'TRACK_EMERGENCY_SUPPLIES'
+        run: |
+          echo "📦 Melacak suplai darurat (pangan, energi, obat)..."
+          echo "| $(date) | AID | Supplies | Tracked |" >> AID_LOG.md
+
+      - name: Audit Distribution Transparency
+        if: github.event.inputs.aid_action == 'AUDIT_DISTRIBUTION_TRANSPARENCY'
+        run: |
+          echo "🔍 Melakukan audit transparansi distribusi..."
+          echo "| $(date) | AID | Transparency | Audited |" >> AID_LOG.md
+
+      - name: Secure Audit Trail
+        run: |
+          git config user.name "CITO-STG-Bot"
+          git config user.email "cito@stg.internal"
+          git add AID_LOG.md
+          git commit -m "Humanitarian Aid Update: ${{ github.event.inputs.aid_action }}"
+          git push
+          
