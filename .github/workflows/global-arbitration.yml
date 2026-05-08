@@ -1,0 +1,52 @@
+name: STG Global Legal Arbitration System
+
+on:
+  workflow_dispatch:
+    inputs:
+      arbitration_action:
+        description: 'Pilih Mode Arbitrase Hukum'
+        required: true
+        type: choice
+        options:
+          - 'INITIATE_CASE'
+          - 'RESOLVE_DISPUTE'
+          - 'LOG_LEGAL_DECISION'
+
+jobs:
+  arbitration-process:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Initialize Arbitration Guard
+        run: |
+          echo "⚖️ Global Legal Arbitration System: ACTIVE"
+          echo "Mode: ${{ github.event.inputs.arbitration_action }} sedang diproses..."
+
+      - name: Initiate Case
+        if: github.event.inputs.arbitration_action == 'INITIATE_CASE'
+        run: |
+          echo "📂 Menginisiasi kasus arbitrase internasional..."
+          echo "| $(date) | ARBITRATION | Case | Initiated |" >> ARBITRATION_LOG.md
+
+      - name: Resolve Dispute
+        if: github.event.inputs.arbitration_action == 'RESOLVE_DISPUTE'
+        run: |
+          echo "🤝 Menyelesaikan sengketa hukum internasional..."
+          echo "| $(date) | ARBITRATION | Dispute | Resolved |" >> ARBITRATION_LOG.md
+
+      - name: Log Legal Decision
+        if: github.event.inputs.arbitration_action == 'LOG_LEGAL_DECISION'
+        run: |
+          echo "📝 Mencatat keputusan hukum ke ledger berdaulat..."
+          echo "| $(date) | ARBITRATION | Decision | Logged |" >> ARBITRATION_LOG.md
+
+      - name: Secure Audit Trail
+        run: |
+          git config user.name "CITO-STG-Bot"
+          git config user.email "cito@stg.internal"
+          git add ARBITRATION_LOG.md
+          git commit -m "Legal Arbitration Update: ${{ github.event.inputs.arbitration_action }}"
+          git push
+          
