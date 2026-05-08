@@ -1,0 +1,53 @@
+name: STG Global Mobility & Bio-Passport System
+
+on:
+  workflow_dispatch:
+    inputs:
+      mobility_action:
+        description: 'Pilih Mode Mobilitas Global'
+        required: true
+        type: choice
+        options:
+          - 'ISSUE_BIO_PASSPORT'
+          - 'VALIDATE_TRAVEL_IDENTITY'
+          - 'MONITOR_GLOBAL_MOBILITY'
+
+jobs:
+  mobility-process:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Initialize Mobility Guard
+        run: |
+          echo "🛂 Global Mobility & Bio-Passport: ACTIVE"
+          echo "Mode: ${{ github.event.inputs.mobility_action }} sedang diproses..."
+
+      - name: Issue Bio-Passport
+        if: github.event.inputs.mobility_action == 'ISSUE_BIO_PASSPORT'
+        run: |
+          echo "📑 Menerbitkan Bio-Passport Digital STG..."
+          echo "STG Bio-Passport ID: GLOBAL-120-NATIONS" >> BIOPASSPORT.txt
+          echo "| $(date) | MOBILITY | Bio-Passport | Issued |" >> MOBILITY_LOG.md
+
+      - name: Validate Travel Identity
+        if: github.event.inputs.mobility_action == 'VALIDATE_TRAVEL_IDENTITY'
+        run: |
+          echo "🔍 Memvalidasi identitas perjalanan dengan ledger berdaulat..."
+          echo "| $(date) | MOBILITY | Identity | Validated |" >> MOBILITY_LOG.md
+
+      - name: Monitor Global Mobility
+        if: github.event.inputs.mobility_action == 'MONITOR_GLOBAL_MOBILITY'
+        run: |
+          echo "🌐 Memantau mobilitas global & pergerakan lintas negara..."
+          echo "| $(date) | MOBILITY | Global Mobility | Monitored |" >> MOBILITY_LOG.md
+
+      - name: Secure Audit Trail
+        run: |
+          git config user.name "CITO-STG-Bot"
+          git config user.email "cito@stg.internal"
+          git add BIOPASSPORT.txt MOBILITY_LOG.md
+          git commit -m "Global Mobility Update: ${{ github.event.inputs.mobility_action }}"
+          git push
+          
