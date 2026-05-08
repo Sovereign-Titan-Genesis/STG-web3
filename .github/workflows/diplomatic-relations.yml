@@ -1,0 +1,52 @@
+name: STG Diplomatic Relations Report
+
+on:
+  workflow_dispatch:
+    inputs:
+      diplomacy_action:
+        description: 'Pilih Mode Diplomasi'
+        required: true
+        type: choice
+        options:
+          - 'GENERATE_DIPLOMATIC_REPORT'
+          - 'REGISTER_INTERNATIONAL_AGREEMENT'
+          - 'LOG_GLOBAL_ALLIANCE'
+
+jobs:
+  diplomacy-process:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Initialize Diplomacy Guard
+        run: |
+          echo "🤝 Diplomatic Relations Report: ACTIVE"
+          echo "Mode: ${{ github.event.inputs.diplomacy_action }} sedang diproses..."
+
+      - name: Generate Diplomatic Report
+        if: github.event.inputs.diplomacy_action == 'GENERATE_DIPLOMATIC_REPORT'
+        run: |
+          echo "📑 Membuat laporan hubungan diplomatik STG..."
+          echo "| $(date) | DIPLOMACY | Report | Generated |" >> DIPLOMACY_LOG.md
+
+      - name: Register International Agreement
+        if: github.event.inputs.diplomacy_action == 'REGISTER_INTERNATIONAL_AGREEMENT'
+        run: |
+          echo "📜 Mendaftarkan perjanjian internasional..."
+          echo "| $(date) | DIPLOMACY | Agreement | Registered |" >> DIPLOMACY_LOG.md
+
+      - name: Log Global Alliance
+        if: github.event.inputs.diplomacy_action == 'LOG_GLOBAL_ALLIANCE'
+        run: |
+          echo "🌐 Mencatat aliansi global STG..."
+          echo "| $(date) | DIPLOMACY | Alliance | Logged |" >> DIPLOMACY_LOG.md
+
+      - name: Secure Audit Trail
+        run: |
+          git config user.name "CITO-STG-Bot"
+          git config user.email "cito@stg.internal"
+          git add DIPLOMACY_LOG.md
+          git commit -m "Diplomatic Relations Update: ${{ github.event.inputs.diplomacy_action }}"
+          git push
+          
