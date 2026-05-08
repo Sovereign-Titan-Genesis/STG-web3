@@ -1,0 +1,59 @@
+name: STG Q-Day Infrastructure Dashboard
+
+on:
+  workflow_dispatch:
+    inputs:
+      qday_infra_action:
+        description: 'Pilih Mode Infrastruktur Q-Day'
+        required: true
+        type: choice
+        options:
+          - 'VISUALIZE_ENERGY_FLOW'
+          - 'TRACK_WATER_SYSTEM'
+          - 'MONITOR_MOBILITY'
+          - 'DIPLOMACY_STATUS'
+
+jobs:
+  qday-infra-process:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Initialize Q-Day Infra Guard
+        run: |
+          echo "🛰️ Q-Day Infrastructure Dashboard: ACTIVE"
+          echo "Mode: ${{ github.event.inputs.qday_infra_action }} sedang diproses..."
+
+      - name: Visualize Energy Flow
+        if: github.event.inputs.qday_infra_action == 'VISUALIZE_ENERGY_FLOW'
+        run: |
+          echo "⚡ Menampilkan aliran energi global..."
+          echo "| $(date) | QDAY-INFRA | Energy Flow | Visualized |" >> QDAY_INFRA_LOG.md
+
+      - name: Track Water System
+        if: github.event.inputs.qday_infra_action == 'TRACK_WATER_SYSTEM'
+        run: |
+          echo "💧 Melacak sistem distribusi air..."
+          echo "| $(date) | QDAY-INFRA | Water System | Tracked |" >> QDAY_INFRA_LOG.md
+
+      - name: Monitor Mobility
+        if: github.event.inputs.qday_infra_action == 'MONITOR_MOBILITY'
+        run: |
+          echo "🚦 Memantau mobilitas & transportasi publik..."
+          echo "| $(date) | QDAY-INFRA | Mobility | Monitored |" >> QDAY_INFRA_LOG.md
+
+      - name: Diplomacy Status
+        if: github.event.inputs.qday_infra_action == 'DIPLOMACY_STATUS'
+        run: |
+          echo "🌐 Menampilkan status diplomasi global..."
+          echo "| $(date) | QDAY-INFRA | Diplomacy | Active |" >> QDAY_INFRA_LOG.md
+
+      - name: Secure Audit Trail
+        run: |
+          git config user.name "CITO-STG-Bot"
+          git config user.email "cito@stg.internal"
+          git add QDAY_INFRA_LOG.md
+          git commit -m "Q-Day Infrastructure Update: ${{ github.event.inputs.qday_infra_action }}"
+          git push
+          
