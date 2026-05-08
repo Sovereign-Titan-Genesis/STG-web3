@@ -1,0 +1,52 @@
+name: STG Global Health Surveillance Dashboard
+
+on:
+  workflow_dispatch:
+    inputs:
+      health_action:
+        description: 'Pilih Mode Kesehatan Global'
+        required: true
+        type: choice
+        options:
+          - 'MONITOR_GLOBAL_HEALTH'
+          - 'TRACK_EPIDEMIC_OUTBREAKS'
+          - 'DISTRIBUTE_VACCINES'
+
+jobs:
+  health-process:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Initialize Health Guard
+        run: |
+          echo "🏥 Global Health Surveillance Dashboard: ACTIVE"
+          echo "Mode: ${{ github.event.inputs.health_action }} sedang diproses..."
+
+      - name: Monitor Global Health
+        if: github.event.inputs.health_action == 'MONITOR_GLOBAL_HEALTH'
+        run: |
+          echo "📡 Memantau kesehatan global..."
+          echo "| $(date) | HEALTH | Global Monitoring | Active |" >> HEALTH_LOG.md
+
+      - name: Track Epidemic Outbreaks
+        if: github.event.inputs.health_action == 'TRACK_EPIDEMIC_OUTBREAKS'
+        run: |
+          echo "🦠 Melacak wabah epidemi internasional..."
+          echo "| $(date) | HEALTH | Epidemic | Tracked |" >> HEALTH_LOG.md
+
+      - name: Distribute Vaccines
+        if: github.event.inputs.health_action == 'DISTRIBUTE_VACCINES'
+        run: |
+          echo "💉 Mendistribusikan vaksin global..."
+          echo "| $(date) | HEALTH | Vaccines | Distributed |" >> HEALTH_LOG.md
+
+      - name: Secure Audit Trail
+        run: |
+          git config user.name "CITO-STG-Bot"
+          git config user.email "cito@stg.internal"
+          git add HEALTH_LOG.md
+          git commit -m "Global Health Update: ${{ github.event.inputs.health_action }}"
+          git push
+          
