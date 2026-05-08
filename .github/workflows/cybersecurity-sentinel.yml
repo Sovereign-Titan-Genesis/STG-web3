@@ -1,0 +1,61 @@
+name: STG Global Cybersecurity Sentinel Report
+
+on:
+  schedule:
+    - cron: '0 0 1 * *' # laporan bulanan setiap tanggal 1
+  workflow_dispatch:
+    inputs:
+      sentinel_action:
+        description: 'Pilih Mode Sentinel'
+        required: true
+        type: choice
+        options:
+          - 'GENERATE_MONTHLY_REPORT'
+          - 'ACTIVATE_QUANTUM_FIREWALL'
+          - 'DEPLOY_INTRUSION_DETECTION'
+          - 'MONITOR_SENTINEL_NODES'
+
+jobs:
+  sentinel-process:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Initialize Sentinel Guard
+        run: |
+          echo "🛡️ Global Cybersecurity Sentinel Report: ACTIVE"
+          echo "Mode: ${{ github.event.inputs.sentinel_action }} sedang diproses..."
+
+      - name: Generate Monthly Report
+        if: github.event.inputs.sentinel_action == 'GENERATE_MONTHLY_REPORT'
+        run: |
+          echo "📑 Membuat laporan bulanan keamanan siber STG..."
+          echo "| $(date) | CYBERSECURITY | Monthly Report | Generated |" >> CYBER_LOG.md
+
+      - name: Activate Quantum Firewall
+        if: github.event.inputs.sentinel_action == 'ACTIVATE_QUANTUM_FIREWALL'
+        run: |
+          echo "⚛️ Mengaktifkan firewall kuantum untuk proteksi ledger..."
+          echo "| $(date) | CYBERSECURITY | Quantum Firewall | Activated |" >> CYBER_LOG.md
+
+      - name: Deploy Intrusion Detection
+        if: github.event.inputs.sentinel_action == 'DEPLOY_INTRUSION_DETECTION'
+        run: |
+          echo "🔍 Menerapkan sistem intrusion detection..."
+          echo "| $(date) | CYBERSECURITY | Intrusion Detection | Deployed |" >> CYBER_LOG.md
+
+      - name: Monitor Sentinel Nodes
+        if: github.event.inputs.sentinel_action == 'MONITOR_SENTINEL_NODES'
+        run: |
+          echo "🌐 Memantau sentinel nodes untuk keamanan jaringan..."
+          echo "| $(date) | CYBERSECURITY | Sentinel Nodes | Monitored |" >> CYBER_LOG.md
+
+      - name: Secure Audit Trail
+        run: |
+          git config user.name "CITO-STG-Bot"
+          git config user.email "cito@stg.internal"
+          git add CYBER_LOG.md
+          git commit -m "Cybersecurity Sentinel Update: ${{ github.event.inputs.sentinel_action }}"
+          git push
+          
