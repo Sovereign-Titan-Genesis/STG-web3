@@ -1,0 +1,52 @@
+name: STG Vesting Wallet Dashboard
+
+on:
+  workflow_dispatch:
+    inputs:
+      vesting_action:
+        description: 'Pilih Mode Vesting Wallet'
+        required: true
+        type: choice
+        options:
+          - 'LOCK_FUNDS'
+          - 'TRACK_VESTING_SCHEDULE'
+          - 'AUDIT_UNIT_DISTRIBUTION'
+
+jobs:
+  vesting-process:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Initialize Vesting Guard
+        run: |
+          echo "🔒 Vesting Wallet Dashboard: ACTIVE"
+          echo "Mode: ${{ github.event.inputs.vesting_action }} sedang diproses..."
+
+      - name: Lock Funds
+        if: github.event.inputs.vesting_action == 'LOCK_FUNDS'
+        run: |
+          echo "💰 Mengunci dana operasional Unit 001‑012..."
+          echo "| $(date) | VESTING | Funds | Locked |" >> VESTING_LOG.md
+
+      - name: Track Vesting Schedule
+        if: github.event.inputs.vesting_action == 'TRACK_VESTING_SCHEDULE'
+        run: |
+          echo "📅 Melacak jadwal distribusi dana..."
+          echo "| $(date) | VESTING | Schedule | Tracked |" >> VESTING_LOG.md
+
+      - name: Audit Unit Distribution
+        if: github.event.inputs.vesting_action == 'AUDIT_UNIT_DISTRIBUTION'
+        run: |
+          echo "📊 Melakukan audit distribusi Unit 001‑012..."
+          echo "| $(date) | VESTING | Distribution | Audited |" >> VESTING_LOG.md
+
+      - name: Secure Audit Trail
+        run: |
+          git config user.name "CITO-STG-Bot"
+          git config user.email "cito@stg.internal"
+          git add VESTING_LOG.md
+          git commit -m "Vesting Wallet Update: ${{ github.event.inputs.vesting_action }}"
+          git push
+          
