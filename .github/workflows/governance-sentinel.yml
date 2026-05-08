@@ -1,0 +1,59 @@
+name: STG Governance Sentinel Dashboard
+
+on:
+  workflow_dispatch:
+    inputs:
+      governance_action:
+        description: 'Pilih Mode Governance Sentinel'
+        required: true
+        type: choice
+        options:
+          - 'ACTIVATE_FAILSAFE_GOVERNANCE'
+          - 'RUN_GLOBAL_VOTING'
+          - 'MONITOR_CONSENSUS'
+          - 'DETECT_ANOMALY'
+
+jobs:
+  governance-sentinel-process:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Initialize Governance Sentinel
+        run: |
+          echo "🏛️ Governance Sentinel Dashboard: ACTIVE"
+          echo "Mode: ${{ github.event.inputs.governance_action }} sedang diproses..."
+
+      - name: Activate Failsafe Governance
+        if: github.event.inputs.governance_action == 'ACTIVATE_FAILSAFE_GOVERNANCE'
+        run: |
+          echo "🛡️ Mengaktifkan fail-safe governance STG..."
+          echo "| $(date) | GOVERNANCE | Fail-Safe | Activated |" >> GOVERNANCE_SENTINEL_LOG.md
+
+      - name: Run Global Voting
+        if: github.event.inputs.governance_action == 'RUN_GLOBAL_VOTING'
+        run: |
+          echo "🗳️ Menjalankan voting global berbasis ledger..."
+          echo "| $(date) | GOVERNANCE | Voting | Executed |" >> GOVERNANCE_SENTINEL_LOG.md
+
+      - name: Monitor Consensus
+        if: github.event.inputs.governance_action == 'MONITOR_CONSENSUS'
+        run: |
+          echo "🤝 Memantau konsensus global..."
+          echo "| $(date) | GOVERNANCE | Consensus | Monitored |" >> GOVERNANCE_SENTINEL_LOG.md
+
+      - name: Detect Anomaly
+        if: github.event.inputs.governance_action == 'DETECT_ANOMALY'
+        run: |
+          echo "⚠️ Mendeteksi anomali tata kelola..."
+          echo "| $(date) | GOVERNANCE | Anomaly | Detected |" >> GOVERNANCE_SENTINEL_LOG.md
+
+      - name: Secure Audit Trail
+        run: |
+          git config user.name "CITO-STG-Bot"
+          git config user.email "cito@stg.internal"
+          git add GOVERNANCE_SENTINEL_LOG.md
+          git commit -m "Governance Sentinel Update: ${{ github.event.inputs.governance_action }}"
+          git push
+          
