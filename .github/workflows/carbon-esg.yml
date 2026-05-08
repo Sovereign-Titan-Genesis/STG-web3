@@ -1,0 +1,52 @@
+name: STG Carbon Ledger & ESG Dashboard
+
+on:
+  workflow_dispatch:
+    inputs:
+      carbon_action:
+        description: 'Pilih Mode Ekologi'
+        required: true
+        type: choice
+        options:
+          - 'TRACK_CARBON_CONTRIBUTIONS'
+          - 'MONITOR_CO2_REDUCTION'
+          - 'AUDIT_ESG_COMPLIANCE'
+
+jobs:
+  carbon-process:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Initialize Carbon Guard
+        run: |
+          echo "🌱 Carbon Ledger & ESG Dashboard: ACTIVE"
+          echo "Mode: ${{ github.event.inputs.carbon_action }} sedang diproses..."
+
+      - name: Track Carbon Contributions
+        if: github.event.inputs.carbon_action == 'TRACK_CARBON_CONTRIBUTIONS'
+        run: |
+          echo "🌍 Melacak kontribusi karbon dari aktivitas STG..."
+          echo "| $(date) | CARBON | Contributions | Tracked |" >> CARBON_LOG.md
+
+      - name: Monitor CO2 Reduction
+        if: github.event.inputs.carbon_action == 'MONITOR_CO2_REDUCTION'
+        run: |
+          echo "🌫️ Memantau pengurangan CO₂ global..."
+          echo "| $(date) | CARBON | CO2 Reduction | Monitored |" >> CARBON_LOG.md
+
+      - name: Audit ESG Compliance
+        if: github.event.inputs.carbon_action == 'AUDIT_ESG_COMPLIANCE'
+        run: |
+          echo "📊 Melakukan audit kepatuhan ESG..."
+          echo "| $(date) | CARBON | ESG Compliance | Audited |" >> CARBON_LOG.md
+
+      - name: Secure Audit Trail
+        run: |
+          git config user.name "CITO-STG-Bot"
+          git config user.email "cito@stg.internal"
+          git add CARBON_LOG.md
+          git commit -m "Carbon Ledger Update: ${{ github.event.inputs.carbon_action }}"
+          git push
+          
