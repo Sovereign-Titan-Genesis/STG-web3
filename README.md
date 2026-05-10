@@ -88,6 +88,41 @@ flowchart LR
 - **Developer**: tahu urutan job dan dependensi antar langkah.  
 
 --     
+## 🔄 CI/CD Flow Diagram
+
+```mermaid
+flowchart LR
+    A[Test] --> B[Deploy-Testnet]
+    B --> C[Verify (Sepolia Etherscan)]
+    C --> D[Deploy-Prod]
+    D --> E[Verify (Mainnet Etherscan)]
+
+    style A fill:#6cf,stroke:#333,stroke-width:2px
+    style B fill:#f96,stroke:#333,stroke-width:2px
+    style C fill:#9f6,stroke:#333,stroke-width:2px
+    style D fill:#f66,stroke:#333,stroke-width:2px
+    style E fill:#6f9,stroke:#333,stroke-width:2px
+
+
+
+---
+
+### 📋 Penjelasan Node
+- **[Test](ca://s?q=CI_CD_Test_Job)** → Unit test dijalankan otomatis setiap push/PR.  
+- **[Deploy-Testnet](ca://s?q=CI_CD_Deploy_Testnet)** → Branch `develop` memicu deploy ke Sepolia.  
+- **[Verify Sepolia](ca://s?q=CI_CD_Verify_Sepolia_Etherscan)** → Kontrak diverifikasi di Sepolia Etherscan.  
+- **[Deploy-Prod](ca://s?q=CI_CD_Deploy_Prod_Mainnet)** → Branch `main` memicu deploy ke mainnet (approval environment `production`).  
+- **[Verify Mainnet](ca://s?q=CI_CD_Verify_Mainnet_Etherscan)** → Kontrak diverifikasi di Etherscan Mainnet.  
+
+---
+
+### 🎯 Manfaat Visualisasi
+- **Investor**: langsung melihat alur deploy dan titik verifikasi.  
+- **Regulator/Auditor**: memahami kontrol approval di mainnet.  
+- **Developer**: tahu urutan job dan dependensi antar langkah.  
+
+---
+
 
 
 
