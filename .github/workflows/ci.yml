@@ -42,8 +42,7 @@ jobs:
         run: npm ci
         working-directory: ./stg-web3
       - name: Start Hardhat node
-        run: |
-          npx hardhat node > hh_node.log 2>&1 &
+        run: npx hardhat node > hh_node.log 2>&1 &
         working-directory: ./stg-web3
       - name: Wait for node
         run: sleep 5
@@ -52,6 +51,18 @@ jobs:
         working-directory: ./stg-web3
       - name: Deploy to testnet
         run: npx hardhat run scripts/deploySTGToken.js --network ${{ env.TARGET_NETWORK }}
+        working-directory: ./stg-web3
+      - name: Verify contract on Etherscan
+        if: success()
+        env:
+          ETHERSCAN_API_KEY: ${{ secrets.ETHERSCAN_API_KEY }}
+        run: |
+          CONTRACT_ADDRESS=$(cat deploy-address.txt || echo "")
+          if [ -z "$CONTRACT_ADDRESS" ]; then
+            echo "No contract address found, skipping verification."
+            exit 0
+          fi
+          npx hardhat verify --network ${{ env.TARGET_NETWORK }} $CONTRACT_ADDRESS
         working-directory: ./stg-web3
       - name: Upload log on failure
         if: failure()
@@ -81,8 +92,7 @@ jobs:
         run: npm ci
         working-directory: ./stg-web3
       - name: Start Hardhat node
-        run: |
-          npx hardhat node > hh_node.log 2>&1 &
+        run: npx hardhat node > hh_node.log 2>&1 &
         working-directory: ./stg-web3
       - name: Wait for node
         run: sleep 5
@@ -92,6 +102,18 @@ jobs:
       - name: Deploy to mainnet
         run: npx hardhat run scripts/deploySTGToken.js --network ${{ env.TARGET_NETWORK }}
         working-directory: ./stg-web3
+      - name: Verify contract on Etherscan
+        if: success()
+        env:
+          ETHERSCAN_API_KEY: ${{ secrets.ETHERSCAN_API_KEY }}
+        run: |
+          CONTRACT_ADDRESS=$(cat deploy-address.txt || echo "")
+          if [ -z "$CONTRACT_ADDRESS" ]; then
+            echo "No contract address found, skipping verification."
+            exit 0
+          fi
+          npx hardhat verify --network ${{ env.TARGET_NETWORK }} $CONTRACT_ADDRESS
+        working-directory: ./stg-web3
       - name: Upload log on failure
         if: failure()
         uses: actions/upload-artifact@v4
@@ -99,16 +121,3 @@ jobs:
           name: hardhat-node-log
           path: stg-web3/hh_node.log
           
-- name: Verify contract on Etherscan
-  if: success()
-  env:
-    ETHERSCAN_API_KEY: ${{ secrets.ETHERSCAN_API_KEY }}
-  run: |
-    CONTRACT_ADDRESS=$(cat deploy-address.txt || echo "")
-    if [ -z "$CONTRACT_ADDRESS" ]; then
-      echo "No contract address found, skipping verification."
-      exit 0
-    fi
-    npx hardhat verify --network ${{ env.TARGET_NETWORK }} $CONTRACT_ADDRESS
-  working-directory: ./stg-web3
-  
