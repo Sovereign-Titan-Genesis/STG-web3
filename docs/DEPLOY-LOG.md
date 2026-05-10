@@ -1,4 +1,4 @@
-## 🚀 Deployment & Audit Transparency
+r**: 🚀 Deployment & Audit Transparency
 
 STG-Web3 menggunakan pipeline CI/CD yang terintegrasi dengan GitHub Actions untuk memastikan proses **test → deploy → verifikasi Etherscan → approval mainnet** berjalan aman dan transparan.
 
@@ -26,3 +26,24 @@ Log ini berisi tabel audit dengan kolom:
 Setiap deploy menghasilkan file `deploy-address.txt` yang berisi alamat kontrak.  
 Workflow otomatis menjalankan `hardhat verify` untuk memastikan kontrak diverifikasi di Etherscan.  
 Link verifikasi akan muncul di log Actions, misalnya:
+
+
+### 🛡️ Rollback Plan
+Jika job `deploy-prod` gagal:
+1. Job ditandai failed, artifact log diunduh.
+2. Alamat kontrak/tx hash dicatat di `DEPLOY-LOG.md`.
+3. Jika kontrak sempat terdeploy tapi tidak diverifikasi → tandai invalid, lakukan redeploy setelah hotfix.
+4. Jika transaksi gagal sebelum deploy → perbaiki config, redeploy.
+5. Reviewer wajib memverifikasi ulang sebelum approval environment `production`.
+
+---
+
+
+# STG-Web3 Deployment Log
+
+| Waktu (UTC)        | Commit Hash | Branch   | Network  | Status   | Catatan                                      |
+|--------------------|-------------|----------|----------|----------|----------------------------------------------|
+| 2026-05-10 07:45   | a1b2c3d     | develop  | Sepolia  | SUCCESS  | Deploy-testnet berhasil, kontrak diverifikasi |
+| 2026-05-10 08:00   | d4e5f6g     | main     | Mainnet  | FAILED   | Gas estimation error, rollback dilakukan      |
+| 2026-05-10 08:30   | h7i8j9k     | hotfix   | Sepolia  | SUCCESS  | Hotfix branch diuji di testnet, verifikasi OK |
+| 2026-05-10 09:00   | l0m1n2o     | main     | Mainnet  | SUCCESS  | Deploy-prod berhasil, kontrak diverifikasi    |
