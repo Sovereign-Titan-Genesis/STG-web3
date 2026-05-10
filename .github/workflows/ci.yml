@@ -15,8 +15,12 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: 18
-      - run: npm ci
-      - run: npx hardhat test
+      - name: Install deps
+        run: npm ci
+        working-directory: ./stg-web3
+      - name: Run tests
+        run: npm test
+        working-directory: ./stg-web3
 
   deploy-testnet:
     name: Deploy to Testnet
@@ -34,11 +38,27 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: 18
-      - run: npm ci
-      - name: Run tests again before deploy
-        run: npx hardhat test --network localhost || true
+      - name: Install deps
+        run: npm ci
+        working-directory: ./stg-web3
+      - name: Start Hardhat node
+        run: |
+          npx hardhat node > hh_node.log 2>&1 &
+        working-directory: ./stg-web3
+      - name: Wait for node
+        run: sleep 5
+      - name: Run tests against localhost
+        run: npm test -- --network localhost
+        working-directory: ./stg-web3
       - name: Deploy to testnet
         run: npx hardhat run scripts/deploySTGToken.js --network ${{ env.TARGET_NETWORK }}
+        working-directory: ./stg-web3
+      - name: Upload log on failure
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: hardhat-node-log
+          path: stg-web3/hh_node.log
 
   deploy-prod:
     name: Deploy to Mainnet
@@ -57,9 +77,25 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: 18
-      - run: npm ci
-      - name: Run tests again before deploy
-        run: npx hardhat test --network localhost || true
+      - name: Install deps
+        run: npm ci
+        working-directory: ./stg-web3
+      - name: Start Hardhat node
+        run: |
+          npx hardhat node > hh_node.log 2>&1 &
+        working-directory: ./stg-web3
+      - name: Wait for node
+        run: sleep 5
+      - name: Run tests against localhost
+        run: npm test -- --network localhost
+        working-directory: ./stg-web3
       - name: Deploy to mainnet
         run: npx hardhat run scripts/deploySTGToken.js --network ${{ env.TARGET_NETWORK }}
-        
+        working-directory: ./stg-web3
+      - name: Upload log on failure
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: hardhat-node-log
+          path: stg-web3/hh_node.log
+          
