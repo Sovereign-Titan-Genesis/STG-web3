@@ -87,11 +87,7 @@ flowchart LR
 - **Regulator/Auditor**: memahami kontrol approval di mainnet.  
 - **Developer**: tahu urutan job dan dependensi antar langkah.  
 
----
-
-🔥 Dengan diagram ini, README Anda akan tampil lebih profesional, transparan, dan mudah dipahami semua pihak.  
-
-Apakah Sultan ingin saya juga buatkan **versi SVG berwarna** dari diagram ini (misalnya untuk ditaruh di folder `docs/ci-cd-flow.svg`) agar bisa dipakai di presentasi atau dashboard eksternal?
+--     
 
 
 
