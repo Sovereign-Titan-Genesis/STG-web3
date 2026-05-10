@@ -56,7 +56,8 @@ STG-Web3 adalah repositori resmi untuk pengembangan kontrak pintar Sovereign Tit
 
 
 
-## 🔄 CI/CD Flow Diagram
+
+## 🔄 CI/CD Flow stroke-width
 
 ```mermaid
 flowchart LR
@@ -70,3 +71,28 @@ flowchart LR
     style C fill:#9f6,stroke:#333,stroke-width:2px
     style D fill:#f66,stroke:#333,stroke-width:2px
     style E fill:#6f9,stroke:#333,stroke-width:2px
+---
+
+### 📋 Penjelasan Node
+- **[Test](ca://s?q=CI_CD_Test_Job)** → Unit test dijalankan otomatis setiap push/PR.  
+- **[Deploy-Testnet](ca://s?q=CI_CD_Deploy_Testnet)** → Branch `develop` memicu deploy ke Sepolia.  
+- **[Verify Sepolia](ca://s?q=CI_CD_Verify_Sepolia_Etherscan)** → Kontrak diverifikasi di Sepolia Etherscan.  
+- **[Deploy-Prod](ca://s?q=CI_CD_Deploy_Prod_Mainnet)** → Branch `main` memicu deploy ke mainnet (approval environment `production`).  
+- **[Verify Mainnet](ca://s?q=CI_CD_Verify_Mainnet_Etherscan)** → Kontrak diverifikasi di Etherscan Mainnet.  
+
+---
+
+### 🎯 Manfaat Visualisasi
+- **Investor**: langsung melihat alur deploy dan titik verifikasi.  
+- **Regulator/Auditor**: memahami kontrol approval di mainnet.  
+- **Developer**: tahu urutan job dan dependensi antar langkah.  
+
+---
+
+🔥 Dengan diagram ini, README Anda akan tampil lebih profesional, transparan, dan mudah dipahami semua pihak.  
+
+Apakah Sultan ingin saya juga buatkan **versi SVG berwarna** dari diagram ini (misalnya untuk ditaruh di folder `docs/ci-cd-flow.svg`) agar bisa dipakai di presentasi atau dashboard eksternal?
+
+
+
+
