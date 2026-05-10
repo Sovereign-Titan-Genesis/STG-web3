@@ -53,3 +53,20 @@ STG-Web3 adalah repositori resmi untuk pengembangan kontrak pintar Sovereign Tit
 | 2026-05-10 08:00   | d4e5f6g     | main     | Mainnet  | FAILED   | Gas estimation error, rollback dilakukan      |
 | 2026-05-10 08:30   | h7i8j9k     | hotfix   | Sepolia  | SUCCESS  | Hotfix branch diuji di testnet, verifikasi OK |
 | 2026-05-10 09:00   | l0m1n2o     | main     | Mainnet  | SUCCESS  | Deploy-prod berhasil, kontrak diverifikasi    |
+
+
+
+## 🔄 CI/CD Flow Diagram
+
+```mermaid
+flowchart LR
+    A[Test] --> B[Deploy-Testnet]
+    B --> C[Verify (Sepolia Etherscan)]
+    C --> D[Deploy-Prod]
+    D --> E[Verify (Mainnet Etherscan)]
+
+    style A fill:#6cf,stroke:#333,stroke-width:2px
+    style B fill:#f96,stroke:#333,stroke-width:2px
+    style C fill:#9f6,stroke:#333,stroke-width:2px
+    style D fill:#f66,stroke:#333,stroke-width:2px
+    style E fill:#6f9,stroke:#333,stroke-width:2px
