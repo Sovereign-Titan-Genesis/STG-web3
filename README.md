@@ -2,6 +2,35 @@
 
 Sovereign Titan Genesis — Web3 Transition Layer
 
+## 🚀 Deployment & CI/CD Status
+
+![CI](https://github.com/Sovereign-Titan-Genesis/STG-web3/actions/workflows/ci.yml/badge.svg)
+
+Pipeline CI/CD untuk **STG-Web3**:
+- **Test Job** → menjalankan unit test pada setiap push/PR.
+- **Deploy-Testnet** → branch `develop` memicu deploy ke Sepolia testnet + verifikasi Etherscan.
+- **Deploy-Prod** → branch `main` memicu deploy ke Ethereum mainnet, job ini memakai environment `production` dan memerlukan approval reviewer.
+
+### 📑 Deployment Log
+Seluruh aktivitas deploy dicatat di [`DEPLOY-LOG.md`](./DEPLOY-LOG.md).  
+Log ini berisi tabel audit dengan kolom waktu, commit hash, branch, network, status, dan catatan.
+
+### 🔗 Verifikasi Kontrak
+Setiap deploy menghasilkan file `deploy-address.txt` berisi alamat kontrak.  
+Workflow otomatis menjalankan `hardhat verify` untuk memastikan kontrak diverifikasi di Etherscan.  
+Link verifikasi akan muncul di log Actions, misalnya:
+- Sepolia: `https://sepolia.etherscan.io/address/0x...#code`
+- Mainnet: `https://etherscan.io/address/0x...#code`
+
+### 🛡️ Rollback Plan
+Jika job `deploy-prod` gagal:
+1. Job ditandai failed, artifact log diunduh.
+2. Alamat kontrak/tx hash dicatat di `DEPLOY-LOG.md`.
+3. Jika kontrak sempat terdeploy tapi tidak diverifikasi → tandai invalid, lakukan redeploy setelah hotfix.
+4. Jika transaksi gagal sebelum deploy → perbaiki config, redeploy.
+5. Reviewer wajib memverifikasi ulang sebelum approval environment `production`.
+6. 
+
 ## Overview
 STG-Web3 adalah repositori resmi untuk pengembangan kontrak pintar Sovereign Titan Genesis (STG). Repo ini berfungsi sebagai jembatan antara sistem AI (STG-1AI) dan blockchain (Ethereum/Polygon testnet).
 
