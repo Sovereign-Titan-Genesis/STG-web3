@@ -16,3 +16,11 @@ STG-Web3 adalah repositori resmi untuk pengembangan kontrak pintar Sovereign Tit
    ```bash
    npm install
    
+# STG-Web3 Deployment Log
+
+| Waktu (UTC)        | Commit Hash | Branch   | Network  | Status   | Catatan                                      |
+|--------------------|-------------|----------|----------|----------|----------------------------------------------|
+| 2026-05-10 07:45   | a1b2c3d     | develop  | Sepolia  | SUCCESS  | Deploy-testnet berhasil, kontrak diverifikasi |
+| 2026-05-10 08:00   | d4e5f6g     | main     | Mainnet  | FAILED   | Gas estimation error, rollback dilakukan      |
+| 2026-05-10 08:30   | h7i8j9k     | hotfix   | Sepolia  | SUCCESS  | Hotfix branch diuji di testnet, verifikasi OK |
+| 2026-05-10 09:00   | l0m1n2o     | main     | Mainnet  | SUCCESS  | Deploy-prod berhasil, kontrak diverifikasi    |
