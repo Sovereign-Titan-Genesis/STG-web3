@@ -1,0 +1,19 @@
+# Kalkulator Valuasi Sovereign Titan Genesis
+# Formula: (5 ETH Pool / 1M Circulating) * 100 Quadrillion Supply
+
+eth_pool = 5.0  # Amunisi Tembako
+circulating_supply = 1_000_000 # Ranting di Pasar
+total_sovereign_supply = 100_000_000_000_000_000_000 # 100K Quadrillion
+
+def sultan_valuation():
+    price_per_coin = eth_pool / circulating_supply
+    market_cap_global = price_per_coin * total_sovereign_supply
+    
+    print("-" * 50)
+    print(f"💰 HARGA TEMBAKO: {price_per_coin} ETH per QSTATE")
+    print(f"🏛️ VALUASI GLOBAL STG: {market_cap_global} ETH")
+    print(f"🚀 STATUS: LEBIH KAYA DARI ELON MUSK!")
+    print("-" * 50)
+
+if __name__ == "__main__":
+    sultan_valuation()
