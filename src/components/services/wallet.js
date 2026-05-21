@@ -11,3 +11,24 @@ export const MINIMAL_ABI = [
     "function totalSupply() view returns (uint256)",
     "function balanceOf(address) view returns (uint256)"
 ];
+import { fetchTokenData, fetchUserBalance } from './services/wallet.js';
+
+async function updateLiveTelemetry(userAddress) {
+    const metaData = await fetchTokenData();
+    if (metaData) {
+        document.getElementById('token-identifier').innerText = `${metaData.name} [${metaData.symbol}]`;
+        document.getElementById('token-symbol').innerText = metaData.symbol;
+        document.getElementById('token-supply').innerText = metaData.supply;
+    }
+    
+    if (userAddress) {
+        const balance = await fetchUserBalance(userAddress);
+        document.getElementById('user-qubi-balance').innerText = balance;
+    }
+}
+
+// Bind this update cycle to your existing wallet connection handler
+window.ethereum.on('accountsChanged', (accounts) => {
+    updateLiveTelemetry(accounts[0]);
+});
+
