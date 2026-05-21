@@ -34,6 +34,16 @@
             <span class="label" style="color: #888;">IO SECTOR READ/WRITE:</span>
             <span id="storage-io-status" class="value" style="color: #00ff00; font-weight: bold;">⚡ STANDBY (IDLE)</span>
         </div>
+       <!-- Tambahkan ini di bagian bawah dalam card-body leveldb-monitor -->
+<div class="restore-action-zone" style="margin-top: 15px; border-top: 1px dashed #333; padding-top: 12px;">
+    <div style="font-size: 11px; color: #ff3333; margin-bottom: 5px; font-weight: bold;">⚠️ EMERGENCY DISASTER RECOVERY</div>
+    <button id="btn-restore-ledger" class="cyber-btn" style="width: 100%; background: rgba(255,51,51,0.1); color: #ff3333; border: 1px solid #ff3333; padding: 8px; font-family: monospace; font-weight: bold; cursor: pointer; transition: all 0.3s;">
+        [⚡ RUN SYSTEM RESTORE DATA ]
+    </button>
+    <div id="restore-status-log" style="font-size: 10px; color: #555; margin-top: 5px; font-style: italic;">
+        System steady. No rollback integrity requested.
+    </div>
+</div>
         
         <div class="disk-usage-box">
             <div style="font-size: 11px; color: #d4af37; margin-bottom: 5px;">LEDGER METRICS DENSITY</div>
