@@ -74,4 +74,19 @@ document.getElementById('btn-propose-release').addEventListener('click', async (
         document.getElementById('btn-propose-release').disabled = false;
     }
 });
+// STG Cryptographic Payload Obfuscator for Visual Privacy
+export function maskCryptoAddress(address) {
+    if (!address || address.length < 10) return "0x0000...0000";
+    
+    // Mengambil 6 karakter pertama (termasuk 0x) dan 4 karakter terakhir
+    const prefix = address.substring(0, 6);
+    const suffix = address.substring(address.length - 4);
+    
+    return `${prefix}...${suffix}`.toUpperCase();
+}
+
+// CONTOH CARA PENGGUNAAN PADA UI:
+// const rawAddress = "0x3AA63941Fe0Ce029f4523c57A30C6dca3cB7343F";
+// document.getElementById("wallet-display").innerText = maskCryptoAddress(rawAddress);
+// Hasil di layar: 0X3AA6...343F
 
