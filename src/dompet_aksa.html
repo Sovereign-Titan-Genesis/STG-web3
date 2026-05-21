@@ -201,6 +201,12 @@ async function handleWalletConnected(userAddress) {
         displayElement.innerText = maskedView;
     }
 }
+document.getElementById('btn-print-audit-cert').addEventListener('click', () => {
+    console.log("🛰️ Preparing cryptographic audit record for physical paper/PDF export...");
+    
+    // Membuka dialog printer bawaan sistem operasi (Pilih opsi 'Save as PDF' pada browser)
+    window.print();
+});
     
 </script>
 <!-- STG SECURE GATEWAY: CYBER SECURITY AUDIT REPORT -->
