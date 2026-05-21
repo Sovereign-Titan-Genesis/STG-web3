@@ -40,6 +40,47 @@
         display: none !important;
     }
 }
+// REKREASI DATA VALIDATOR RESMI (MASUKKAN DAFTAR WALLET RESMI ANDA DISINI)
+const STG_WHITELISTED_WALLETS = [
+    "0x9fE46736679d2D9a65F0992F2272dE9f3c7fa6e0".toLowerCase(), // Contoh Kontrak Utama
+    "0x3AA63941Fe0Ce029f4523c57A30C6dca3cB7343F".toLowerCase()  // Contoh Wallet Pertama Anda
+];
+
+export function verifyEcosystemAccess(connectedAddress) {
+    const banner = document.getElementById('cyber-alert-banner');
+    const details = document.getElementById('alert-details');
+    
+    if (!connectedAddress) return;
+    
+    const currentAddressClean = connectedAddress.toLowerCase();
+    
+    // Periksa apakah alamat dompet terdaftar di manifes keamanan
+    if (STG_WHITELISTED_WALLETS.includes(currentAddressClean)) {
+        // Jika aman, pastikan banner tersembunyi
+        if (banner) banner.style.display = 'none';
+        console.log(`[🛡️ SECURITY] Access granted for verified authority: ${connectedAddress}`);
+    } else {
+        // JIKA ALAMAT ASING TERDETEKSI: NYALAKAN RADAR BEKEDIP MERAH
+        if (banner && details) {
+            banner.style.display = 'block';
+            details.innerText = `INTRUDER SIGNATURE: ${connectedAddress.toUpperCase()} | TARGET BLOCK: UNIT 008 RESIDENT RESERVES | FIREWALL STATUS: ENFORCED`;
+            
+            // Efek kilatan layar darurat pada body dashboard
+            document.body.classList.add('flash-red-screen');
+            setTimeout(() => document.body.classList.remove('flash-red-screen'), 500);
+        }
+        console.warn(`[🚨 INTRUSION ALERT] Unauthorized wallet attempted interaction: ${connectedAddress}`);
+    }
+}
+
+// Integrasikan pemanggilan ini setiap kali akun di MetaMask berubah
+if (window.ethereum) {
+    window.ethereum.on('accountsChanged', (accounts) => {
+        if (accounts.length > 0) {
+            verifyEcosystemAccess(accounts[0]);
+        }
+    });
+}
 
 <!-- STG Qubicoin Live Telemetry Panel -->
 <div class="card telemetry-card" id="qubicoin-panel">
@@ -256,4 +297,26 @@ document.getElementById('btn-print-audit-cert').addEventListener('click', () => 
         </div>
     </div>
 </div>
+<!-- STG REAL-TIME CYBER THREAT INTRUSION BANNER -->
+<div id="cyber-alert-banner" style="display: none; background: #ff3333; color: #fff; font-family: 'Courier New', monospace; padding: 15px; text-align: center; font-weight: bold; font-size: 14px; letter-spacing: 2px; border-bottom: 3px solid #000; box-shadow: 0 5px 15px rgba(255,51,51,0.5); z-index: 9999; position: relative;">
+    <span class="alert-icon" style="animation: blink-animation 1s infinite;">⚠️ [ WARNING: UNAUTHORIZED WALLET CONFLICT DETECTED ] ⚠️</span>
+    <div id="alert-details" style="font-size: 11px; font-weight: normal; margin-top: 5px; color: #ffcccc;">
+        INTRUDER ADDRESS: 0x... | PROTOCOL INTRUSION ATTEMPT BLOCKED.
+    </div>
+</div>
+
+<style>
+@keyframes blink-animation {
+    0% { opacity: 1; }
+    50% { opacity: 0.2; }
+    100% { opacity: 1; }
+}
+.flash-red-screen {
+    animation: screen-flash 0.5s ease-in-out;
+}
+@keyframes screen-flash {
+    0% { background-color: rgba(255,51,51,0.3); }
+    100% { background-color: transparent; }
+}
+</style>
 
