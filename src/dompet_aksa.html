@@ -1,3 +1,46 @@
+@media print {
+    /* Sembunyikan seluruh elemen dashboard kecuali kartu laporan audit */
+    body * {
+        visibility: hidden;
+    }
+    #security-audit-panel, #security-audit-panel * {
+        visibility: visible;
+    }
+    /* Posisikan sertifikat secara mutlak di halaman cetak */
+    #security-audit-panel {
+        position: absolute;
+        left: 0;
+        top: 0;
+        width: 100%;
+        border: 2px solid #000 !important;
+        background: #fff !important;
+        color: #000 !important;
+        box-shadow: none !important;
+        padding: 40px !important;
+    }
+    /* Sesuaikan skema warna teks monitor menjadi warna cetak formal */
+    .cyber-header {
+        background: #000 !important;
+        color: #fff !important;
+        font-size: 18px !important;
+        padding: 10px !important;
+        text-align: center;
+    }
+    .audit-meta, .audit-item div {
+        color: #000 !important;
+    }
+    .audit-footer {
+        background: #eee !important;
+        color: #000 !important;
+        border: 1px solid #000 !important;
+        margin-top: 30px !important;
+    }
+    /* Sembunyikan tombol cetak itu sendiri di dalam hasil PDF */
+    .print-action-zone {
+        display: none !important;
+    }
+}
+
 <!-- STG Qubicoin Live Telemetry Panel -->
 <div class="card telemetry-card" id="qubicoin-panel">
     <div class="card-header border-cyber">
