@@ -139,6 +139,20 @@
             document.getElementById('btn-propose-release').disabled = false;
         }
     });
+    import { maskCryptoAddress } from './services/wallet.js';
+
+// Hubungkan ini ke dalam fungsi rendering wallet connected Anda
+async function handleWalletConnected(userAddress) {
+    // Menyamarkan alamat asli demi keamanan privasi di layar monitor
+    const maskedView = maskCryptoAddress(userAddress);
+    
+    // Ganti 'user-wallet-address-element' dengan ID elemen HTML display wallet Anda
+    const displayElement = document.getElementById('user-wallet-address-element');
+    if (displayElement) {
+        displayElement.innerText = maskedView;
+    }
+}
+    
 </script>
 <!-- STG SECURE GATEWAY: CYBER SECURITY AUDIT REPORT -->
 <div class="card audit-card" id="security-audit-panel" style="margin-top: 20px; border: 1px solid #ff3333; background: rgba(5,0,0,0.95); box-shadow: 0 0 15px rgba(255,51,51,0.1);">
