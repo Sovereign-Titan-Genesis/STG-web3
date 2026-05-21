@@ -31,4 +31,47 @@ async function updateLiveTelemetry(userAddress) {
 window.ethereum.on('accountsChanged', (accounts) => {
     updateLiveTelemetry(accounts[0]);
 });
+import { proposeVaultRelease } from './services/wallet.js';
+
+document.getElementById('btn-propose-release').addEventListener('click', async () => {
+    const targetAddress = document.getElementById('target-withdrawal-address').value;
+    const amount = document.getElementById('target-withdrawal-amount').value;
+    const statusText = document.querySelector('.secured-text');
+    const progressText = document.getElementById('current-approvals');
+    const progressBar = document.getElementById('approval-progress');
+
+    // Validasi Input Sederhana
+    if (!targetAddress || !amount || amount <= 0) {
+        alert("⚠️ Mohon isi alamat tujuan dan jumlah aset STG dengan benar!");
+        return;
+    }
+
+    try {
+        // Mengubah status UI menjadi mode memproses
+        document.getElementById('btn-propose-release').innerText = "⏳ MENUNGGU DI DOMPET METAMASK...";
+        document.getElementById('btn-propose-release').disabled = true;
+
+        // Memanggil fungsi jembatan ke MetaMask
+        const result = await proposeVaultRelease(targetAddress, amount);
+
+        if (result.success) {
+            alert(`🎉 Kunci Keamanan Pertama Berhasil Disahkan!\nTransaksi Hash: ${result.txHash}`);
+            
+            // Memperbarui visual NASA Command Center ke status multi-sig aktif
+            statusText.innerText = "⏳ PENDING VERIFICATION (KUNCI 1 DISETUJUI)";
+            statusText.style.color = "#ffcc00";
+            progressText.innerText = "1 / 2 Wallet Terverifikasi";
+            progressBar.style.width = "50%";
+            progressBar.style.backgroundColor = "#ffcc00";
+        } else {
+            alert(`❌ Transaksi Dibatalkan atau Gagal: ${result.error}`);
+        }
+    } catch (err) {
+        console.error(err);
+    } finally {
+        // Mengembalikan status tombol ke semula
+        document.getElementById('btn-propose-release').innerText = "AJUKAN PROPOSAL PENCAIRAN (KUNCI 1)";
+        document.getElementById('btn-propose-release').disabled = false;
+    }
+});
 
