@@ -20,6 +20,35 @@
         </div>
     </div>
 </div>
+<!-- STG STORAGE ENGINE LEVELDB REAL-TIME METRICS -->
+<div class="card storage-card" id="leveldb-monitor" style="margin-top: 20px; border: 1px solid #d4af37;">
+    <div class="card-header cyber-header" style="color: #d4af37;">
+        🗄️ HARDWARE INTERFACE: LEVELDB STORAGE ENGINE
+    </div>
+    <div class="card-body">
+        <div class="data-row" style="display: flex; justify-content: space-between; margin-bottom: 10px;">
+            <span class="label" style="color: #888;">DATABASE PATH:</span>
+            <span class="value" style="font-family: monospace; color: #aaa;">~/stg_ledger_db/</span>
+        </div>
+        <div class="data-row" style="display: flex; justify-content: space-between; margin-bottom: 15px;">
+            <span class="label" style="color: #888;">IO SECTOR READ/WRITE:</span>
+            <span id="storage-io-status" class="value" style="color: #00ff00; font-weight: bold;">⚡ STANDBY (IDLE)</span>
+        </div>
+        
+        <div class="disk-usage-box">
+            <div style="font-size: 11px; color: #d4af37; margin-bottom: 5px;">LEDGER METRICS DENSITY</div>
+            <div class="progress-bar-bg" style="background: #111; border: 1px solid #333; height: 12px; width: 100%; position: relative;">
+                <div id="storage-density-bar" style="background: linear-gradient(90deg, #d4af37, #00ff00); height: 100%; width: 15%;"></div>
+            </div>
+            <div style="display: flex; justify-content: space-between; font-size: 10px; margin-top: 4px; color: #555;">
+                <span>0 KB</span>
+                <span id="disk-bytes-counter" style="color: #888;">Allocated Index: 4.09 KB</span>
+                <span>Persistent Vault</span>
+            </div>
+        </div>
+    </div>
+</div>
+
 <!-- STG MULTI-SIG GOVERNANCE CONTROL CENTER -->
 <div class="card governance-card" id="multi-sig-panel" style="margin-top: 20px; border: 1px solid #00ffcc;">
     <div class="card-header cyber-header">
