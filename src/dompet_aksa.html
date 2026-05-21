@@ -20,3 +20,35 @@
         </div>
     </div>
 </div>
+<!-- STG MULTI-SIG GOVERNANCE CONTROL CENTER -->
+<div class="card governance-card" id="multi-sig-panel" style="margin-top: 20px; border: 1px solid #00ffcc;">
+    <div class="card-header cyber-header">
+        🛡️ SECURITY PROTOCOL: UNIT 008 MULTI-SIG VAULT
+    </div>
+    <div class="card-body">
+        <div class="status-box">
+            <span class="label">VAULT LOCK STATUS:</span>
+            <span class="value secured-text" style="color: #00ffcc; font-weight: bold;">🔒 LOCKED (2-DAY TIMELOCK ACTIVE)</span>
+        </div>
+        
+        <!-- Form Pengajuan Pengeluaran Aset -->
+        <div class="gov-action-form" style="margin-top: 15px;">
+            <label class="label">TARGET MUTASI REKENING:</label>
+            <input type="text" id="target-withdrawal-address" placeholder="0x..." class="cyber-input" style="width: 100%; background: #111; color: #fff; border: 1px solid #333; padding: 5px;">
+            
+            <label class="label" style="margin-top: 10px; display:block;">JUMLAH ASSET STG (QUBI):</label>
+            <input type="number" id="target-withdrawal-amount" placeholder="0.00" class="cyber-input" style="width: 100%; background: #111; color: #fff; border: 1px solid #333; padding: 5px;">
+            
+            <button id="btn-propose-release" class="cyber-btn" style="margin-top: 15px; width: 100%; background: #00ffcc; color: #000; font-weight: bold; border: none; padding: 10px; cursor: pointer;">
+                AJUKAN PROPOSAL PENCAIRAN (KUNCI 1)
+            </button>
+        </div>
+
+        <div class="approval-chain" style="margin-top: 15px; font-size: 12px; border-top: 1px dashed #333; padding-top: 10px;">
+            <div>Persetujuan Multi-Sig Terdeteksi: <span id="current-approvals">0 / 2 Wallet Terverifikasi</span></div>
+            <div class="progress-bar-bg" style="background: #222; height: 5px; width: 100%; margin-top: 5px;">
+                <div id="approval-progress" style="background: #00ffcc; height: 100%; width: 0%;"></div>
+            </div>
+        </div>
+    </div>
+</div>
