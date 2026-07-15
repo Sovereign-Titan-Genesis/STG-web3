@@ -124,6 +124,34 @@ flowchart LR
 ---
 
 
+# STG-web3
+
+STG-web3 adalah lapisan antarmuka RPC dan SDK untuk ekosistem STG.  
+Fokus utama: **RPC node**, **SDK lintas bahasa**, dan **explorer API**.
+
+## ✨ Fitur Utama
+- RPC node kompatibel JSON-RPC (eth_call, eth_sendTransaction, dll).
+- SDK untuk JavaScript, Python, Go, dan integrasi lintas bahasa.
+- Explorer API untuk query blok, transaksi, dan status proof.
+- Integrasi langsung dengan STG-Chain & STG-CONSESUS.
+
+## 📂 Struktur
+- `rpc/` → server RPC & handler.
+- `sdk/` → library JS, Python, Go.
+- `explorer/` → API & UI explorer.
+
+## 🚀 Roadmap
+- v0.1 → RPC node internal.
+- v0.2 → SDK publik + explorer sederhana.
+- v1.0 → Explorer penuh + integrasi wallet eksternal.
+
+## 🔒 Keamanan
+Endpoint RPC dilindungi dengan rate limiting & monitoring.
+
+## 🤝 Kontribusi
+Lihat [CONTRIBUTING.md](CONTRIBUTING.md).
+
+
 
 
 
