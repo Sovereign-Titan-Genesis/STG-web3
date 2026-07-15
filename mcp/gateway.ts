@@ -11,7 +11,7 @@ const providers = {
   stg: new ethers.JsonRpcProvider(process.env.STG_RPC_URL)
 };
 
-// Example MCP Tool: Get Balance
+// Tool: Get Balance
 app.post('/mcp/getBalance', async (req, res) => {
   const { address, token, provider } = req.body;
   try {
@@ -25,14 +25,42 @@ app.post('/mcp/getBalance', async (req, res) => {
   }
 });
 
-// Example MCP Tool: Get Validators
-app.post('/mcp/getValidators', async (req, res) => {
-  // Placeholder: integrate with STG-Consensus
-  const validators = [
-    { id: "validator1", status: "active" },
-    { id: "validator2", status: "inactive" }
-  ];
-  res.json({ validators });
+// Tool: Execute Transfer (nyata)
+app.post('/mcp/executeTransfer', async (req, res) => {
+  const { from, to, amount, token, provider, privateKey } = req.body;
+  try {
+    const wallet = new ethers.Wallet(privateKey, providers[provider] || providers['stg']);
+    const contract = new ethers.Contract(token, [
+      "function transfer(address to, uint256 amount) returns (bool)"
+    ], wallet);
+    const tx = await contract.transfer(to, amount);
+    await tx.wait();
+    res.json({ status: "success", txHash: tx.hash });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// Tool: Get Document Proof
+app.post('/mcp/getDocumentProof', async (req, res) => {
+  const { hash } = req.body;
+  // Placeholder: integrate with SSPA Human Rights Ledger
+  res.json({ hash, verified: true, timestamp: Date.now() });
+});
+
+// Tool: Register Identity
+app.post('/mcp/registerIdentity', async (req, res) => {
+  const { address, metadata } = req.body;
+  // Placeholder: integrate with STG Identity smart contract
+  res.json({ address, metadata, status: "registered" });
+});
+
+// Tool: Audit Trail
+app.post('/mcp/auditTrail', async (req, res) => {
+  const { action, userId } = req.body;
+  // Placeholder: log to STG AuditTrail
+  console.log(`[AUDIT] ${Date.now()} - ${userId} - ${action}`);
+  res.json({ status: "logged" });
 });
 
 app.listen(4000, () => {
