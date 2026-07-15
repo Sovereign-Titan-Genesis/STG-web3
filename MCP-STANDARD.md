@@ -3,7 +3,7 @@ document: STG MCP Standard
 version: 0.1
 date: 2026-07-15
 status: Draft
-author: Lumen (Andi Muhammad Harpianto)
+author: Andi Muhammad Harpianto
 review: STG Foundation Core
 repository: stg-web3
 license: MIT
@@ -68,3 +68,15 @@ Tujuan utama: menyediakan **gateway modular** yang memungkinkan AI melakukan ope
 - Semua perubahan MCP wajib melalui proposal governance.
 - Voting berbasis token QSTATE.
 - Audit hasil voting sebelum eksekusi.
+
+## II. AI Tool Registry (Extended)
+
+- `getBalance(address, token)` → Menampilkan saldo token.
+- `getTransactions(contract, limit)` → Mencari transaksi terakhir.
+- `verifyGovernance(proposalId)` → Memverifikasi status proposal governance.
+- `getValidators()` → Menampilkan validator aktif.
+- `simulateTransfer(from, to, amount)` → Simulasi transfer sebelum dikirim.
+- `executeTransfer(from, to, amount, token)` → Melakukan transfer nyata dengan validasi permission.
+- `getDocumentProof(hash)` → Menampilkan bukti hash dokumen SSPA.
+- `registerIdentity(address, metadata)` → Mendaftarkan identitas digital ke STG Identity.
+- `auditTrail(action, userId)` → Mencatat semua interaksi ke STG AuditTrail.
