@@ -66,3 +66,21 @@ app.post('/mcp/auditTrail', async (req, res) => {
 app.listen(4000, () => {
   console.log("STG MCP Gateway running on port 4000");
 });
+// Tool: Register Identity
+app.post('/mcp/registerIdentity', async (req, res) => {
+  const { address, metadata, provider, privateKey } = req.body;
+  try {
+    const wallet = new ethers.Wallet(privateKey, providers[provider] || providers['stg']);
+    const contract = new ethers.Contract(process.env.IDENTITY_CONTRACT, [
+      "function registerIdentity(string metadata)",
+      "function updateIdentity(string metadata)",
+      "function deactivateIdentity()"
+    ], wallet);
+
+    const tx = await contract.registerIdentity(metadata);
+    await tx.wait();
+    res.json({ status: "success", txHash: tx.hash });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
